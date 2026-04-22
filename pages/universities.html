@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>대학별 모집인원 | 2027학년도 대입정보 119</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .table-wrap table { font-size: 13px; }
+    thead th { font-size: 12px; padding: 10px 8px; }
+    tbody td { padding: 8px 8px; }
+    .group-header { background: #f0f4ff !important; }
+    .group-header td { font-weight: 700; color: var(--primary); font-size: 13px; padding: 8px 12px; }
+    .zero { color: #d1d5db; }
+    .total-col { background: #f8faff; font-weight: 700; color: var(--primary); }
+    .sort-btn { cursor: pointer; user-select: none; }
+    .sort-btn:hover { text-decoration: underline; }
+    .sort-indicator { font-size: 10px; margin-left: 2px; }
+    .sticky-name { position: sticky; left: 0; background: white; z-index: 1; border-right: 1px solid var(--border); }
+    tr:hover .sticky-name { background: #eef2ff; }
+    .stat-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+    .stat-pill { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 8px 16px; font-size: 13px; }
+    .stat-pill strong { color: var(--primary); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <a href="../index.html" style="display:flex;align-items:center;gap:10px;color:white">
+        <span>📚</span><span>대입정보 119</span><span class="logo-badge">2027</span>
+      </a>
+    </div>
+    <nav>
+      <a href="../index.html">홈</a>
+      <a href="schedule.html">전형 일정</a>
+      <a href="universities.html" class="active">대학별 모집인원</a>
+      <a href="types.html">전형 유형</a>
+      <a href="special.html">특별전형</a>
+      <a href="fields.html">계열별 분석</a>
+    </nav>
+  </div>
+</header>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <h1>🏫 대학별 모집인원</h1>
+    <p>2027학년도 전국 238개 대학 전형 유형별 모집인원 현황 | 검색·지역·전형 유형별 필터 지원</p>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="filter-bar">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="대학명 검색..." oninput="filterTable()">
+    </div>
+    <div class="select-wrap">
+      <select id="regionFilter" onchange="filterTable()">
+        <option value="">전체 지역</option>
+        <option>서울</option><option>인천</option><option>경기</option>
+        <option>강원</option><option>대전</option><option>세종</option>
+        <option>충남</option><option>충북</option><option>대구</option>
+        <option>경북</option><option>부산</option><option>울산</option>
+        <option>경남</option><option>광주</option><option>전남</option>
+        <option>전북</option><option>제주</option>
+      </select>
+    </div>
+    <div class="select-wrap">
+      <select id="typeFilter" onchange="filterTable()">
+        <option value="">전체 전형</option>
+        <option value="수시_교과">수시 - 학생부교과</option>
+        <option value="수시_종합">수시 - 학생부종합</option>
+        <option value="수시_논술">수시 - 논술</option>
+        <option value="수시_실기">수시 - 실기/실적</option>
+        <option value="정시_수능">정시 - 수능</option>
+        <option value="정시_실기">정시 - 실기/실적</option>
+      </select>
+    </div>
+    <div class="select-wrap">
+      <select id="sortBy" onchange="sortTable()">
+        <option value="">정렬: 지역·가나다순</option>
+        <option value="합계_desc">모집인원 많은 순</option>
+        <option value="합계_asc">모집인원 적은 순</option>
+        <option value="name_asc">대학명 오름차순</option>
+        <option value="수시_교과_desc">교과전형 많은 순</option>
+        <option value="수시_종합_desc">종합전형 많은 순</option>
+        <option value="수시_논술_desc">논술전형 많은 순</option>
+        <option value="정시_수능_desc">수능전형 많은 순</option>
+      </select>
+    </div>
+    <div class="result-count" id="resultCount"></div>
+  </div>
+
+  <div class="table-wrap">
+    <table id="uniTable">
+      <thead>
+        <tr>
+          <th rowspan="2" class="sticky-name">지역</th>
+          <th rowspan="2" class="sticky-name" style="left:52px;min-width:120px">대학</th>
+          <th colspan="5" style="background:#1a4da8">수시모집</th>
+          <th colspan="5" style="background:#4c1d95">정시모집</th>
+          <th rowspan="2">합계</th>
+        </tr>
+        <tr class="table-sub-head">
+          <th style="background:#1a4da8;color:#bfdbfe">학생부교과</th>
+          <th style="background:#1a4da8;color:#bfdbfe">학생부종합</th>
+          <th style="background:#1a4da8;color:#bfdbfe">논술</th>
+          <th style="background:#1a4da8;color:#bfdbfe">실기/실적</th>
+          <th style="background:#1a4da8;color:#bfdbfe">기타</th>
+          <th style="background:#4c1d95;color:#ddd6fe">수능</th>
+          <th style="background:#4c1d95;color:#ddd6fe">실기/실적</th>
+          <th style="background:#4c1d95;color:#ddd6fe">교과</th>
+          <th style="background:#4c1d95;color:#ddd6fe">종합</th>
+          <th style="background:#4c1d95;color:#ddd6fe">기타</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination" id="pagination"></div>
+
+</div>
+
+<footer>
+  <p>2027학년도 대입정보 119 | 한국대학교육협의회 발간 자료 기반</p>
+</footer>
+
+<script src="../js/data.js"></script>
+<script>
+const REGIONS_ORDER = ['서울','인천','경기','강원','대전','세종','충남','충북','대구','경북','부산','울산','경남','광주','전남','전북','제주'];
+const REGION_ORDER_MAP = {};
+REGIONS_ORDER.forEach((r,i) => REGION_ORDER_MAP[r] = i);
+
+let filtered = [...UNIVERSITIES];
+let currentPage = 1;
+const PAGE_SIZE = 50;
+
+function fmt(n) {
+  if (n === 0) return '<span class="zero">-</span>';
+  return n.toLocaleString();
+}
+
+function getRegionTag(region) {
+  return `<span class="region-tag region-${region}">${region}</span>`;
+}
+
+function filterTable() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const region = document.getElementById('regionFilter').value;
+  const type = document.getElementById('typeFilter').value;
+
+  filtered = UNIVERSITIES.filter(u => {
+    if (q && !u.name.toLowerCase().includes(q)) return false;
+    if (region && u.region !== region) return false;
+    if (type && u[type] === 0) return false;
+    return true;
+  });
+
+  currentPage = 1;
+  sortTable(false);
+  renderTable();
+  renderPagination();
+}
+
+function sortTable(doRender = true) {
+  const sortBy = document.getElementById('sortBy').value;
+  if (!sortBy) {
+    filtered.sort((a,b) => {
+      const rd = REGION_ORDER_MAP[a.region] - REGION_ORDER_MAP[b.region];
+      if (rd !== 0) return rd;
+      return a.name.localeCompare(b.name, 'ko');
+    });
+  } else {
+    const [field, dir] = sortBy.split('_');
+    const key = sortBy.replace('_desc','').replace('_asc','');
+    if (key === 'name') {
+      filtered.sort((a,b) => a.name.localeCompare(b.name,'ko'));
+    } else {
+      filtered.sort((a,b) => dir === 'desc' ? b[key]-a[key] : a[key]-b[key]);
+    }
+  }
+  if (doRender) { renderTable(); renderPagination(); }
+}
+
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  const start = (currentPage-1)*PAGE_SIZE;
+  const page = filtered.slice(start, start+PAGE_SIZE);
+
+  document.getElementById('resultCount').innerHTML = `<strong>${filtered.length}</strong>개 대학`;
+
+  let html = '';
+  let lastRegion = null;
+
+  page.forEach(u => {
+    if (u.region !== lastRegion && document.getElementById('sortBy').value === '') {
+      lastRegion = u.region;
+    }
+    html += `<tr>
+      <td class="sticky-name">${getRegionTag(u.region)}</td>
+      <td class="sticky-name text-left" style="left:52px">${u.name}</td>
+      <td>${fmt(u['수시_교과'])}</td>
+      <td>${fmt(u['수시_종합'])}</td>
+      <td>${fmt(u['수시_논술'])}</td>
+      <td>${fmt(u['수시_실기'])}</td>
+      <td>${fmt(u['수시_기타'])}</td>
+      <td>${fmt(u['정시_수능'])}</td>
+      <td>${fmt(u['정시_실기'])}</td>
+      <td>${fmt(u['정시_교과'])}</td>
+      <td>${fmt(u['정시_종합'])}</td>
+      <td>${fmt(u['정시_기타'])}</td>
+      <td class="total-col">${u['합계'].toLocaleString()}</td>
+    </tr>`;
+  });
+
+  tbody.innerHTML = html;
+}
+
+function renderPagination() {
+  const total = Math.ceil(filtered.length / PAGE_SIZE);
+  const pg = document.getElementById('pagination');
+  if (total <= 1) { pg.innerHTML=''; return; }
+  let html = '';
+  if (currentPage > 1) html += `<button class="page-btn" onclick="goPage(${currentPage-1})">◀</button>`;
+  const start = Math.max(1, currentPage-2);
+  const end = Math.min(total, currentPage+2);
+  if (start > 1) html += `<button class="page-btn" onclick="goPage(1)">1</button>${start>2?'<span style="padding:0 4px">…</span>':''}`;
+  for (let i=start;i<=end;i++) {
+    html += `<button class="page-btn${i===currentPage?' active':''}" onclick="goPage(${i})">${i}</button>`;
+  }
+  if (end < total) html += `${end<total-1?'<span style="padding:0 4px">…</span>':''}<button class="page-btn" onclick="goPage(${total})">${total}</button>`;
+  if (currentPage < total) html += `<button class="page-btn" onclick="goPage(${currentPage+1})">▶</button>`;
+  pg.innerHTML = html;
+}
+
+function goPage(n) {
+  currentPage = n;
+  renderTable();
+  renderPagination();
+  window.scrollTo({top:200,behavior:'smooth'});
+}
+
+// init
+filterTable();
+</script>
+</body>
+</html>
